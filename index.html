@@ -1,0 +1,5925 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CodeSnap — Turn Code Into Visuals</title>
+  <meta name="description" content="CodeSnap — Turn Code Into Visuals. Create beautiful customizable code screenshots.">
+  <meta name="theme-color" content="#0b111b">
+
+  <!-- Highlight.js -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css"
+    id="highlightThemeLink"
+  >
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Hack:wght@400;700&family=Inconsolata:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Ubuntu+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root {
+      --bg: #080d15;
+      --panel: #0d1520;
+      --panel-2: #111b29;
+      --panel-3: #151f2e;
+      --input: #0a111b;
+      --line: #253247;
+      --line-soft: #1a2637;
+
+      --text: #eef3ff;
+      --muted: #8b9ab2;
+      --muted-2: #65758e;
+
+      --primary: #7c5cff;
+      --primary-2: #9a82ff;
+      --cyan: #06b6d4;
+      --pink: #ff007f;
+
+      --radius: 12px;
+      --sidebar-width: 330px;
+
+      --transition: 160ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      min-width: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
+      min-width: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =========================================================
+       APP
+    ========================================================= */
+
+    .app {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(124,92,255,.08), transparent 30%),
+        radial-gradient(circle at 100% 100%, rgba(6,182,212,.05), transparent 30%),
+        var(--bg);
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .header {
+      height: 64px;
+      min-height: 64px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+
+      background: rgba(9, 15, 24, .96);
+      border-bottom: 1px solid var(--line-soft);
+      backdrop-filter: blur(14px);
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      user-select: none;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 10px;
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+
+      background:
+        linear-gradient(135deg, #7c5cff, #06b6d4);
+
+      box-shadow:
+        0 8px 24px rgba(124,92,255,.22);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+      min-width: 0;
+    }
+
+    .brand-name {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -.2px;
+    }
+
+    .brand-tagline {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .55px;
+      text-transform: uppercase;
+    }
+
+    .header-status {
+      margin-left: 4px;
+      color: #63e6a3;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      height: 38px;
+      padding: 0 13px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+
+      border: 1px solid var(--line);
+      border-radius: 9px;
+
+      background: #111a27;
+      color: #dfe7f7;
+
+      font-size: 12px;
+      font-weight: 700;
+
+      transition:
+        transform var(--transition),
+        border-color var(--transition),
+        background var(--transition),
+        box-shadow var(--transition);
+    }
+
+    .btn:hover {
+      border-color: #3a4c69;
+      background: #162133;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.primary {
+      color: white;
+      border-color: transparent;
+
+      background:
+        linear-gradient(135deg, #7c5cff, #6350db);
+
+      box-shadow:
+        0 8px 24px rgba(124,92,255,.20);
+    }
+
+    .btn.primary:hover {
+      box-shadow:
+        0 10px 28px rgba(124,92,255,.30);
+    }
+
+    .btn.reset {
+      color: #f3a5b6;
+    }
+
+    /* =========================================================
+       MAIN LAYOUT
+    ========================================================= */
+
+    .layout {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+
+    .sidebar {
+      min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      padding: 18px 16px 14px;
+
+      background: #0b131e;
+      border-right: 1px solid var(--line-soft);
+    }
+
+    .sidebar::-webkit-scrollbar,
+    .mobile-drawer::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb,
+    .mobile-drawer::-webkit-scrollbar-thumb {
+      background: #29374d;
+      border-radius: 10px;
+    }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+
+      color: #8190aa;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .section-heading .section-title {
+      margin: 0;
+    }
+
+    /* =========================================================
+       PRESETS
+    ========================================================= */
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .preset {
+      min-height: 43px;
+      padding: 8px 9px;
+
+      border: 1px solid var(--line);
+      border-radius: 9px;
+
+      background: #0e1724;
+      color: #aebbd0;
+
+      font-size: 11px;
+      font-weight: 700;
+
+      transition: var(--transition);
+    }
+
+    .preset:hover {
+      border-color: #43516a;
+      color: white;
+    }
+
+    .preset.active {
+      border-color: var(--primary);
+      background: rgba(124,92,255,.10);
+      color: white;
+      box-shadow: 0 0 0 1px rgba(124,92,255,.10);
+    }
+
+    /* =========================================================
+       CARBON STYLE TABS
+    ========================================================= */
+
+    .carbon-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      margin-bottom: 14px;
+      padding: 3px;
+
+      border: 1px solid var(--line);
+      border-radius: 9px;
+
+      background: #080f18;
+    }
+
+    .carbon-tab {
+      height: 32px;
+
+      border: 0;
+      border-radius: 6px;
+
+      background: transparent;
+      color: #718199;
+
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .4px;
+
+      transition: var(--transition);
+    }
+
+    .carbon-tab:hover {
+      color: #b7c3d7;
+    }
+
+    .carbon-tab.active {
+      background: #182236;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    /* =========================================================
+       CONTROLS
+    ========================================================= */
+
+    .control {
+      margin-bottom: 13px;
+    }
+
+    .control:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 6px;
+
+      color: #9aa9c0;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .control-label span:last-child {
+      color: #65758d;
+      font-weight: 600;
+    }
+
+    .select,
+    .text-input,
+    .number-input {
+      width: 100%;
+      height: 38px;
+
+      padding: 0 10px;
+
+      border: 1px solid var(--line);
+      border-radius: 8px;
+
+      outline: none;
+
+      background: #09111b;
+      color: #e9effb;
+
+      font-size: 11px;
+
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .select:focus,
+    .text-input:focus,
+    .number-input:focus {
+      border-color: rgba(124,92,255,.75);
+      box-shadow: 0 0 0 3px rgba(124,92,255,.08);
+    }
+
+    .select option {
+      background: #0b131e;
+      color: white;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) 52px;
+      align-items: center;
+      gap: 9px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .range-value {
+      height: 32px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 1px solid var(--line);
+      border-radius: 7px;
+
+      background: #09111b;
+      color: #bdc8d9;
+
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* =========================================================
+       SWITCH
+    ========================================================= */
+
+    .switch-row {
+      min-height: 38px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 10px;
+
+      border: 1px solid var(--line);
+      border-radius: 8px;
+
+      background: #09111b;
+    }
+
+    .switch-label {
+      color: #aebbd0;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .switch {
+      position: relative;
+      width: 38px;
+      height: 21px;
+      flex: 0 0 38px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+
+      border-radius: 30px;
+      background: #253247;
+
+      transition: .2s;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: "";
+
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      left: 3px;
+      top: 3px;
+
+      border-radius: 50%;
+      background: #8997ac;
+
+      transition: .2s;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--primary);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(17px);
+      background: white;
+    }
+
+    /* =========================================================
+       WINDOW STYLE
+    ========================================================= */
+
+    .window-style-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .window-style {
+      min-width: 0;
+      min-height: 105px;
+
+      padding: 8px 7px 9px;
+
+      border: 1px solid #27364d;
+      border-radius: 12px;
+
+      background: #0e1724;
+      color: #b8c4d7;
+
+      transition:
+        border-color .18s ease,
+        background .18s ease,
+        box-shadow .18s ease,
+        transform .18s ease;
+    }
+
+    .window-style:hover {
+      border-color: #435370;
+      background: #121d2c;
+      transform: translateY(-1px);
+    }
+
+    .window-style.active {
+      border: 2px solid var(--primary);
+      padding: 7px 6px 8px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(124,92,255,.12),
+          rgba(124,92,255,.035)
+        );
+
+      color: white;
+
+      box-shadow:
+        0 0 0 1px rgba(124,92,255,.08),
+        0 8px 26px rgba(124,92,255,.08);
+    }
+
+    .window-preview {
+      width: 100%;
+      height: 43px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 11px;
+
+      border: 2px solid #27364d;
+      border-radius: 10px;
+
+      background: #080d14;
+
+      margin-bottom: 9px;
+    }
+
+    .window-style.active .window-preview {
+      border-color: #33425a;
+    }
+
+    .window-preview-dots {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .window-preview-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: block;
+      flex: 0 0 12px;
+    }
+
+    .window-style-name {
+      display: block;
+
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 700;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Mini window previews */
+
+    .window-style[data-window-style="default"] .window-preview-dot {
+      background: #8290a6;
+    }
+
+    .window-style[data-window-style="macos"] .window-preview-dot:nth-child(1) {
+      background: #ff5f57;
+    }
+
+    .window-style[data-window-style="macos"] .window-preview-dot:nth-child(2) {
+      background: #febc2e;
+    }
+
+    .window-style[data-window-style="macos"] .window-preview-dot:nth-child(3) {
+      background: #28c840;
+    }
+
+    .window-style[data-window-style="minimal"] .window-preview-dot:nth-child(1) {
+      background: #f5f7fa;
+    }
+
+    .window-style[data-window-style="minimal"] .window-preview-dot:nth-child(2) {
+      background: #adb4bf;
+    }
+
+    .window-style[data-window-style="minimal"] .window-preview-dot:nth-child(3) {
+      background: transparent;
+      border: 2px solid #778194;
+    }
+
+    .window-style[data-window-style="dark"] .window-preview-dot {
+      background: #222b3b;
+    }
+
+    .window-style[data-window-style="linux"] .window-preview-dot:nth-child(1) {
+      background: #5885ff;
+    }
+
+    .window-style[data-window-style="linux"] .window-preview-dot:nth-child(2) {
+      background: #ffa41c;
+    }
+
+    .window-style[data-window-style="linux"] .window-preview-dot:nth-child(3) {
+      background: #27c463;
+    }
+
+    .window-style[data-window-style="terminal"] .window-preview-dot:nth-child(1) {
+      background: #4ade80;
+    }
+
+    .window-style[data-window-style="terminal"] .window-preview-dot:nth-child(2) {
+      background: #22c55e;
+    }
+
+    .window-style[data-window-style="terminal"] .window-preview-dot:nth-child(3) {
+      background: #86efac;
+    }
+
+    .window-style[data-window-style="solarized"] .window-preview-dot:nth-child(1) {
+      background: #d8a600;
+    }
+
+    .window-style[data-window-style="solarized"] .window-preview-dot:nth-child(2) {
+      background: #d95b1b;
+    }
+
+    .window-style[data-window-style="solarized"] .window-preview-dot:nth-child(3) {
+      background: #2aa198;
+    }
+
+    .window-style[data-window-style="neon"] .window-preview-dot:nth-child(1) {
+      background: #ff00b8;
+    }
+
+    .window-style[data-window-style="neon"] .window-preview-dot:nth-child(2) {
+      background: #8b5cf6;
+    }
+
+    .window-style[data-window-style="neon"] .window-preview-dot:nth-child(3) {
+      background: #00d9ff;
+    }
+
+    .window-style[data-window-style="full-black"] .window-preview-dot {
+      background: #030303;
+      border: 2px solid #090909;
+    }
+
+    /* =========================================================
+       BACKGROUND
+    ========================================================= */
+
+    .bg-tabs {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 4px;
+
+      margin-bottom: 10px;
+      padding: 3px;
+
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #080f18;
+    }
+
+    .bg-tab {
+      height: 29px;
+
+      border: 0;
+      border-radius: 5px;
+
+      background: transparent;
+      color: #718199;
+
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .bg-tab.active {
+      background: #172236;
+      color: white;
+    }
+
+    .color-picker-row {
+      display: grid;
+      grid-template-columns: 42px minmax(0,1fr);
+      gap: 8px;
+    }
+
+    .color-input {
+      width: 42px;
+      height: 38px;
+      padding: 3px;
+
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #09111b;
+      cursor: pointer;
+    }
+
+    .gradient-presets {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .gradient {
+      height: 28px;
+
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 6px;
+
+      cursor: pointer;
+      transition: transform .15s ease;
+    }
+
+    .gradient:hover {
+      transform: scale(1.04);
+    }
+
+    .image-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 7px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .small-btn {
+      height: 36px;
+      padding: 0 10px;
+
+      border: 1px solid var(--line);
+      border-radius: 8px;
+
+      background: #101a27;
+      color: #aebbd0;
+
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .small-btn:hover {
+      border-color: #43516a;
+      color: white;
+    }
+
+    /* =========================================================
+       CREDIT
+    ========================================================= */
+
+    .settings-credit {
+      padding: 16px 4px 5px;
+      margin-top: 10px;
+
+      border-top: 1px solid var(--line-soft);
+
+      text-align: center;
+
+      font-size: 10px;
+      color: #596a83;
+    }
+
+    .settings-credit a {
+      margin-left: 3px;
+
+      color: #9a87ff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .settings-credit a:hover {
+      color: #b5a8ff;
+      text-decoration: underline;
+    }
+
+    /* =========================================================
+       WORKSPACE
+    ========================================================= */
+
+    .workspace {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .mobile-bar {
+      display: none;
+    }
+
+    .toolbar {
+      height: 50px;
+      min-height: 50px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 14px;
+
+      border-bottom: 1px solid var(--line-soft);
+      background: #0b131e;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .filename {
+      max-width: 320px;
+
+      color: #9eacc0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .language-badge {
+      padding: 4px 7px;
+
+      border: 1px solid #26354a;
+      border-radius: 5px;
+
+      background: #0e1724;
+      color: #71829a;
+
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    /* =========================================================
+       EDITOR
+    ========================================================= */
+
+    .editor-wrap {
+      height: 38%;
+      min-height: 240px;
+
+      padding: 12px;
+
+      border-bottom: 1px solid var(--line-soft);
+      background: #080e17;
+    }
+
+    .editor {
+      position: relative;
+      width: 100%;
+      height: 100%;
+
+      border: 1px solid #223047;
+      border-radius: 10px;
+
+      overflow: hidden;
+
+      background: #0b111b;
+
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.015);
+    }
+
+    .editor textarea,
+    .editor-highlight {
+      position: absolute;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      margin: 0;
+      padding: 16px;
+
+      border: 0;
+      outline: 0;
+
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+
+      white-space: pre;
+      tab-size: 2;
+
+      overflow: auto;
+    }
+
+    .editor textarea {
+      z-index: 2;
+
+      resize: none;
+
+      background: transparent;
+      color: transparent;
+      caret-color: #ffffff;
+
+      -webkit-text-fill-color: transparent;
+    }
+
+    .editor textarea::selection {
+      background: rgba(124,92,255,.28);
+      color: transparent;
+    }
+
+    .editor-highlight {
+      z-index: 1;
+      pointer-events: none;
+      color: #dbe4f5;
+    }
+
+    .editor-highlight code {
+      font: inherit;
+      white-space: inherit;
+    }
+
+    .editor textarea::-webkit-scrollbar,
+    .editor-highlight::-webkit-scrollbar,
+    .preview-area::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    .editor textarea::-webkit-scrollbar-thumb,
+    .editor-highlight::-webkit-scrollbar-thumb,
+    .preview-area::-webkit-scrollbar-thumb {
+      background: #29374c;
+      border-radius: 10px;
+    }
+
+    /* =========================================================
+       PREVIEW AREA
+    ========================================================= */
+
+    .preview-area {
+      flex: 1;
+      min-height: 0;
+
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+
+      overflow: auto;
+
+      background:
+        radial-gradient(circle at 50% 40%, rgba(124,92,255,.04), transparent 42%),
+        #080c12;
+    }
+
+    .export-frame {
+      width: max-content;
+      min-width: 100%;
+
+      min-height: 100%;
+
+      padding: 64px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+      position: relative;
+
+      background: transparent;
+    }
+
+    /* =========================================================
+       CODE CARD
+    ========================================================= */
+
+    .code-card {
+      width: max-content;
+      min-width: 0;
+      max-width: none;
+
+      flex: 0 0 auto;
+
+      overflow: hidden;
+
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+
+      background: #0d1117;
+
+      box-shadow: 0 24px 70px rgba(0,0,0,.53);
+
+      transition:
+        border-radius .18s ease,
+        box-shadow .18s ease;
+    }
+
+    .window-bar {
+      width: 100%;
+      min-height: 48px;
+
+      display: flex;
+      align-items: center;
+
+      position: relative;
+
+      padding: 0 17px;
+
+      background: #111822;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .window-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+
+      display: block;
+
+      border-radius: 50%;
+    }
+
+    .dot.red {
+      background: #ff5f57;
+    }
+
+    .dot.yellow {
+      background: #febc2e;
+    }
+
+    .dot.green {
+      background: #28c840;
+    }
+
+    .preview-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+
+      max-width: 60%;
+
+      color: #8997aa;
+
+      font-size: 10px;
+      font-weight: 600;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-title code {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* =========================================================
+       WINDOW STYLES
+    ========================================================= */
+
+    .window-bar.window-default {
+      background: #111822;
+    }
+
+    .window-bar.window-default .dot {
+      background: #7d899a;
+    }
+
+    .window-bar.window-default .dot.red,
+    .window-bar.window-default .dot.yellow,
+    .window-bar.window-default .dot.green {
+      background: #7d899a;
+    }
+
+    .window-bar.window-macos {
+      background: #161b22;
+    }
+
+    .window-bar.window-macos .dot.red {
+      background: #ff5f57;
+    }
+
+    .window-bar.window-macos .dot.yellow {
+      background: #febc2e;
+    }
+
+    .window-bar.window-macos .dot.green {
+      background: #28c840;
+    }
+
+    .window-bar.window-minimal {
+      background: #0b1017;
+      border-bottom-color: rgba(255,255,255,.04);
+    }
+
+    .window-bar.window-minimal .dot.red {
+      background: white;
+    }
+
+    .window-bar.window-minimal .dot.yellow {
+      background: #9ca3af;
+    }
+
+    .window-bar.window-minimal .dot.green {
+      background: transparent;
+      border: 2px solid #70798a;
+    }
+
+    .window-bar.window-dark {
+      background: #080b10;
+    }
+
+    .window-bar.window-dark .dot.red,
+    .window-bar.window-dark .dot.yellow,
+    .window-bar.window-dark .dot.green {
+      background: #242d3c;
+    }
+
+    .window-bar.window-linux {
+      background: #161c25;
+    }
+
+    .window-bar.window-linux .dot.red {
+      background: #5885ff;
+    }
+
+    .window-bar.window-linux .dot.yellow {
+      background: #ffa41c;
+    }
+
+    .window-bar.window-linux .dot.green {
+      background: #27c463;
+    }
+
+    .window-bar.window-terminal {
+      background: #06120c;
+      border-bottom-color: rgba(74,222,128,.12);
+    }
+
+    .window-bar.window-terminal .dot.red {
+      background: #4ade80;
+    }
+
+    .window-bar.window-terminal .dot.yellow {
+      background: #22c55e;
+    }
+
+    .window-bar.window-terminal .dot.green {
+      background: #86efac;
+    }
+
+    .window-bar.window-terminal .preview-title {
+      color: #65d98b;
+    }
+
+    .window-bar.window-solarized {
+      background: #073642;
+    }
+
+    .window-bar.window-solarized .dot.red {
+      background: #d8a600;
+    }
+
+    .window-bar.window-solarized .dot.yellow {
+      background: #d95b1b;
+    }
+
+    .window-bar.window-solarized .dot.green {
+      background: #2aa198;
+    }
+
+    .window-bar.window-neon {
+      background: #090611;
+      border-bottom-color: rgba(255,0,127,.25);
+
+      box-shadow:
+        inset 0 -1px 0 rgba(0,217,255,.10);
+    }
+
+    .window-bar.window-neon .dot.red {
+      background: #ff00b8;
+      box-shadow: 0 0 10px #ff00b8;
+    }
+
+    .window-bar.window-neon .dot.yellow {
+      background: #8b5cf6;
+      box-shadow: 0 0 10px #8b5cf6;
+    }
+
+    .window-bar.window-neon .dot.green {
+      background: #00d9ff;
+      box-shadow: 0 0 10px #00d9ff;
+    }
+
+    .window-bar.window-neon .preview-title {
+      color: #cfbfff;
+    }
+
+    .window-bar.window-full-black {
+      background: #000;
+      border-bottom-color: #050505;
+    }
+
+    .window-bar.window-full-black .dot {
+      background: #010101;
+      border: 1px solid #0c0c0c;
+    }
+
+    .window-bar.window-full-black .preview-title {
+      color: #414141;
+    }
+
+    /* =========================================================
+       PREVIEW CODE
+    ========================================================= */
+
+    .preview-code {
+      display: flex;
+      width: max-content;
+      min-width: 100%;
+
+      align-items: stretch;
+
+      background: #0d1117;
+    }
+
+    .preview-lines {
+      flex: 0 0 auto;
+
+      padding: 17px 11px 17px 17px;
+
+      border-right: 1px solid rgba(255,255,255,.06);
+
+      background: rgba(0,0,0,.08);
+
+      color: #56657b;
+
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+
+      text-align: right;
+      user-select: none;
+
+      white-space: pre;
+    }
+
+    .preview-highlight {
+      width: max-content;
+      min-width: 0;
+      max-width: none;
+
+      flex: 0 0 auto;
+
+      margin: 0;
+      padding: 17px;
+
+      background: transparent;
+
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+
+      white-space: pre;
+      tab-size: 2;
+
+      overflow: visible;
+    }
+
+    .preview-highlight code {
+      display: block;
+
+      width: max-content;
+      min-width: 0;
+
+      padding: 0;
+      margin: 0;
+
+      background: transparent;
+
+      font: inherit;
+      line-height: inherit;
+
+      white-space: pre;
+    }
+
+    /*
+      Penting:
+      Jangan memaksa semua span menjadi color:inherit.
+      Highlight.js membutuhkan warna tokennya sendiri.
+    */
+
+    .preview-highlight .hljs,
+    .editor-highlight .hljs {
+      background: transparent !important;
+    }
+
+    .watermark {
+      width: 100%;
+
+      padding: 11px 16px;
+
+      border-top: 1px solid rgba(255,255,255,.06);
+
+      background: rgba(0,0,0,.06);
+
+      color: rgba(255,255,255,.42);
+
+      font-size: 9px;
+      font-weight: 600;
+
+      text-align: right;
+      letter-spacing: .2px;
+    }
+
+    /* =========================================================
+       MOBILE DRAWER
+    ========================================================= */
+
+    .drawer-overlay {
+      display: none;
+    }
+
+    .mobile-drawer {
+      display: none;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 1100px) {
+      :root {
+        --sidebar-width: 290px;
+      }
+
+      .window-style-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+
+      .export-frame {
+        padding: 42px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      html,
+      body {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .app {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .header {
+        height: 58px;
+        min-height: 58px;
+        padding: 0 10px;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+        flex-basis: 32px;
+      }
+
+      .brand-name {
+        font-size: 14px;
+      }
+
+      .brand-tagline {
+        display: none;
+      }
+
+      .header-status {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 6px;
+      }
+
+      .header-actions .secondary,
+      .header-actions .reset {
+        display: none;
+      }
+
+      .header-actions .primary {
+        height: 38px;
+        padding: 0 11px;
+      }
+
+      .layout {
+        width: 100%;
+        min-width: 0;
+        min-height: calc(100vh - 58px);
+
+        display: block;
+
+        overflow: hidden;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .workspace {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* Mobile controls */
+
+      .mobile-bar {
+        display: block;
+
+        width: 100%;
+        height: 58px;
+        min-height: 58px;
+
+        padding: 8px 10px;
+
+        border-bottom: 1px solid var(--line);
+        background: #0e1520;
+
+        overflow: hidden;
+      }
+
+      .mobile-scroll {
+        width: 100%;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .mobile-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      .mobile-action,
+      .mobile-scroll select {
+        flex: 0 0 auto;
+        height: 40px;
+
+        white-space: nowrap;
+      }
+
+      .mobile-scroll select {
+        width: 142px;
+        min-width: 142px;
+        padding: 0 9px;
+      }
+
+      .mobile-action {
+        padding: 0 11px;
+      }
+
+      .toolbar {
+        height: 50px;
+        min-height: 50px;
+        width: 100%;
+
+        padding: 0 10px;
+      }
+
+      .toolbar-right {
+        display: none;
+      }
+
+      .toolbar-left {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .filename {
+        max-width: 45vw;
+      }
+
+      .editor-wrap {
+        width: 100%;
+        height: 34vh;
+        min-height: 260px;
+        max-height: 360px;
+
+        padding: 10px;
+
+        overflow: hidden;
+      }
+
+      .editor {
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+      }
+
+      .editor textarea,
+      .editor-highlight {
+        padding: 14px;
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      /*
+        Preview dibuat benar-benar full width.
+        Kartu kode tidak dipaksa mengecil.
+        Jika kode panjang, user dapat horizontal scroll.
+      */
+
+      .preview-area {
+        width: 100%;
+        min-width: 100%;
+        max-width: none;
+
+        min-height: 0;
+
+        display: block;
+
+        overflow-x: auto;
+        overflow-y: auto;
+
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .export-frame {
+        width: max-content;
+        min-width: 100%;
+
+        min-height: 100%;
+
+        padding: 28px 16px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .code-card {
+        width: max-content;
+        min-width: 0;
+        max-width: none;
+      }
+
+      .preview-code {
+        width: max-content;
+        min-width: 0;
+      }
+
+      .preview-highlight {
+        font-size: 12px;
+        line-height: 1.55;
+        padding: 14px;
+      }
+
+      .preview-lines {
+        font-size: 12px;
+        line-height: 1.55;
+        padding: 14px 9px 14px 12px;
+      }
+
+      .window-bar {
+        min-height: 43px;
+        padding: 0 13px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+      }
+
+      .window-dots {
+        gap: 7px;
+      }
+
+      .preview-title {
+        font-size: 9px;
+      }
+
+      /* Drawer */
+
+      .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+
+        display: block;
+
+        background: rgba(0,0,0,.58);
+
+        opacity: 0;
+        pointer-events: none;
+
+        transition: opacity .2s ease;
+      }
+
+      .drawer-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .mobile-drawer {
+        position: fixed;
+        z-index: 100;
+
+        top: 0;
+        right: 0;
+        bottom: 0;
+
+        width: min(94vw, 390px);
+
+        display: flex;
+        flex-direction: column;
+
+        transform: translateX(100%);
+
+        background: #0b131e;
+        border-left: 1px solid var(--line);
+
+        box-shadow: -20px 0 60px rgba(0,0,0,.45);
+
+        transition: transform .24s ease;
+
+        overflow: hidden;
+      }
+
+      .mobile-drawer.open {
+        transform: translateX(0);
+      }
+
+      .drawer-header {
+        height: 58px;
+        min-height: 58px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 14px;
+
+        border-bottom: 1px solid var(--line-soft);
+      }
+
+      .drawer-title {
+        color: white;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .drawer-close {
+        width: 34px;
+        height: 34px;
+
+        border: 1px solid var(--line);
+        border-radius: 8px;
+
+        background: #111b29;
+        color: #aebbd0;
+
+        font-size: 17px;
+      }
+
+      .drawer-body {
+        flex: 1;
+        min-height: 0;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        padding: 16px;
+      }
+
+      .drawer-section {
+        margin-bottom: 22px;
+      }
+
+      .drawer-footer {
+        padding-top: 10px;
+      }
+
+      .mobile-window-grid {
+        grid-template-columns: repeat(3, minmax(0,1fr));
+      }
+
+      .mobile-window-grid .window-style {
+        min-height: 94px;
+      }
+
+      .mobile-window-grid .window-preview {
+        height: 36px;
+        padding: 0 8px;
+      }
+
+      .mobile-window-grid .window-preview-dot {
+        width: 9px;
+        height: 9px;
+        flex-basis: 9px;
+      }
+
+      .mobile-window-grid .window-preview-dots {
+        gap: 6px;
+      }
+
+      .mobile-window-grid .window-style-name {
+        font-size: 9px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .mobile-drawer {
+        width: 100%;
+      }
+
+      .export-frame {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .mobile-window-grid {
+        gap: 7px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- =======================================================
+       HEADER
+  ======================================================== -->
+
+  <header class="header">
+
+    <div class="brand">
+      <div class="brand-mark">
+        &lt;CS/&gt;
+      </div>
+
+      <div class="brand-text">
+        <div class="brand-name">CodeSnap</div>
+        <div class="brand-tagline">Turn Code Into Visuals.</div>
+      </div>
+
+      <span class="header-status">● Ready</span>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        type="button"
+        class="btn secondary"
+        id="copyBtn"
+      >
+        ⧉ Copy
+      </button>
+
+      <button
+        type="button"
+        class="btn reset"
+        id="resetBtn"
+      >
+        ↺ Reset
+      </button>
+
+      <button
+        type="button"
+        class="btn primary"
+        id="pngBtn"
+      >
+        ↓ Export PNG
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- =======================================================
+       LAYOUT
+  ======================================================== -->
+
+  <div class="layout">
+
+    <!-- =====================================================
+         DESKTOP SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+      <!-- PRESETS -->
+
+      <section class="section">
+
+        <div class="section-title">STYLE / PRESETS</div>
+
+        <div class="preset-grid">
+
+          <button type="button" class="preset active" data-preset="aurora">
+            Aurora
+          </button>
+
+          <button type="button" class="preset" data-preset="sunset">
+            Sunset
+          </button>
+
+          <button type="button" class="preset" data-preset="synthwave">
+            Synthwave
+          </button>
+
+          <button type="button" class="preset" data-preset="midnight">
+            Midnight
+          </button>
+
+          <button type="button" class="preset" data-preset="ocean">
+            Ocean
+          </button>
+
+          <button type="button" class="preset" data-preset="forest">
+            Forest
+          </button>
+
+          <button type="button" class="preset" data-preset="mono">
+            Mono
+          </button>
+
+        </div>
+
+      </section>
+
+      <!-- SETTINGS TABS -->
+
+      <div class="carbon-tabs">
+
+        <button
+          type="button"
+          class="carbon-tab active"
+          data-tab="window"
+        >
+          WINDOW
+        </button>
+
+        <button
+          type="button"
+          class="carbon-tab"
+          data-tab="editor"
+        >
+          EDITOR
+        </button>
+
+        <button
+          type="button"
+          class="carbon-tab"
+          data-tab="misc"
+        >
+          MISC
+        </button>
+
+      </div>
+
+      <!-- WINDOW PANEL -->
+
+      <div class="tab-panel" data-panel="window">
+
+        <section class="section">
+
+          <div class="section-title">WINDOW CONTROLS</div>
+
+          <div class="window-style-grid">
+
+            <button
+              type="button"
+              class="window-style active"
+              data-window-style="default"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Default</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="macos"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">MacOS</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="minimal"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Minimal</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="dark"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Dark</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="linux"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Linux</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="terminal"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Terminal</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="solarized"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Solarized</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="neon"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Neon</span>
+            </button>
+
+            <button
+              type="button"
+              class="window-style"
+              data-window-style="full-black"
+            >
+              <div class="window-preview">
+                <div class="window-preview-dots">
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                  <span class="window-preview-dot"></span>
+                </div>
+              </div>
+              <span class="window-style-name">Full Black</span>
+            </button>
+
+          </div>
+
+        </section>
+
+        <section class="section">
+
+          <div class="section-title">WINDOW</div>
+
+          <div class="control">
+
+            <div class="switch-row">
+
+              <span class="switch-label">
+                Show Window
+              </span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="showWindow"
+                  checked
+                >
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="switch-row">
+
+              <span class="switch-label">
+                Show Title
+              </span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="showTitle"
+                  checked
+                >
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <div class="settings-credit">
+          <span>Created by</span>
+          <a
+            href="https://ahmatbadali.my.id"
+            target="_blank"
+            rel="noopener noreferrer"
+          >@Ahmat Badali</a>
+        </div>
+
+      </div>
+
+      <!-- EDITOR PANEL -->
+
+      <div class="tab-panel hidden" data-panel="editor">
+
+        <section class="section">
+
+          <div class="section-title">CODE / EDITOR</div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Language</span>
+            </div>
+
+            <select class="select" id="languageSelect"></select>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Filename</span>
+            </div>
+
+            <input
+              class="text-input"
+              id="filenameInput"
+              value="snippet.js"
+              autocomplete="off"
+            >
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Syntax Theme</span>
+            </div>
+
+            <select class="select" id="themeSelect">
+
+              <option value="atom-one-dark">Atom One Dark</option>
+              <option value="github-dark">GitHub Dark</option>
+              <option value="github">GitHub</option>
+              <option value="monokai">Monokai</option>
+              <option value="dracula">Dracula</option>
+              <option value="night-owl">Night Owl</option>
+              <option value="nord">Nord</option>
+              <option value="vs2015">VS 2015</option>
+              <option value="a11y-dark">A11y Dark</option>
+              <option value="tokyo-night-dark">Tokyo Night Dark</option>
+              <option value="base16/onedark">Base16 One Dark</option>
+
+            </select>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Font</span>
+            </div>
+
+            <select class="select" id="fontSelect">
+
+              <option value="jetbrains">JetBrains Mono</option>
+              <option value="fira">Fira Code</option>
+              <option value="sourcecode">Source Code Pro</option>
+              <option value="spacemono">Space Mono</option>
+              <option value="ubuntumono">Ubuntu Mono</option>
+              <option value="inconsolata">Inconsolata</option>
+              <option value="cascadia">Cascadia Code</option>
+              <option value="hack">Hack</option>
+              <option value="system">System Mono</option>
+              <option value="consolas">Consolas</option>
+
+            </select>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Font Size</span>
+              <span id="fontSizeValue">14px</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="fontSizeRange"
+                min="10"
+                max="28"
+                step="1"
+                value="14"
+              >
+
+              <div
+                class="range-value"
+                id="fontSizeValueBox"
+              >14px</div>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Line Height</span>
+              <span id="lineHeightValue">1.55</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="lineHeightRange"
+                min="1.1"
+                max="2.2"
+                step="0.05"
+                value="1.55"
+              >
+
+              <div
+                class="range-value"
+                id="lineHeightValueBox"
+              >1.55</div>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="switch-row">
+
+              <span class="switch-label">
+                Line Numbers
+              </span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="showLines"
+                  checked
+                >
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>First Line Number</span>
+            </div>
+
+            <input
+              class="number-input"
+              type="number"
+              id="firstLineNumber"
+              value="1"
+              min="1"
+              max="9999"
+            >
+
+          </div>
+
+          <div class="control">
+
+            <div class="switch-row">
+
+              <span class="switch-label">
+                Show Hidden Characters
+              </span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="showHiddenChars"
+                >
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <div class="settings-credit">
+          <span>Created by</span>
+          <a
+            href="https://ahmatbadali.my.id"
+            target="_blank"
+            rel="noopener noreferrer"
+          >@Ahmat Badali</a>
+        </div>
+
+      </div>
+
+      <!-- MISC PANEL -->
+
+      <div class="tab-panel hidden" data-panel="misc">
+
+        <section class="section">
+
+          <div class="section-title">CANVAS</div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Vertical Padding</span>
+              <span id="paddingVertValue">64px</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="paddingVertRange"
+                min="0"
+                max="160"
+                step="4"
+                value="64"
+              >
+
+              <div
+                class="range-value"
+                id="paddingVertValueBox"
+              >64px</div>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Horizontal Padding</span>
+              <span id="paddingHorizValue">64px</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="paddingHorizRange"
+                min="0"
+                max="160"
+                step="4"
+                value="64"
+              >
+
+              <div
+                class="range-value"
+                id="paddingHorizValueBox"
+              >64px</div>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Radius</span>
+              <span id="radiusValue">14px</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="radiusRange"
+                min="0"
+                max="32"
+                step="1"
+                value="14"
+              >
+
+              <div
+                class="range-value"
+                id="radiusValueBox"
+              >14px</div>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="switch-row">
+
+              <span class="switch-label">
+                Drop Shadow
+              </span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="dropShadow"
+                  checked
+                >
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Shadow Blur</span>
+              <span id="shadowBlurValue">70px</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="shadowBlurRange"
+                min="0"
+                max="140"
+                step="5"
+                value="70"
+              >
+
+              <div
+                class="range-value"
+                id="shadowBlurValueBox"
+              >70px</div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <section class="section">
+
+          <div class="section-title">BACKGROUND</div>
+
+          <div class="bg-tabs">
+
+            <button
+              type="button"
+              class="bg-tab active"
+              data-bg-tab="gradient"
+            >
+              Gradient
+            </button>
+
+            <button
+              type="button"
+              class="bg-tab"
+              data-bg-tab="color"
+            >
+              Color
+            </button>
+
+            <button
+              type="button"
+              class="bg-tab"
+              data-bg-tab="image"
+            >
+              Image
+            </button>
+
+          </div>
+
+          <div
+            class="bg-panel"
+            data-bg-panel="gradient"
+          >
+
+            <div class="gradient-presets">
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#8b5cf6,#06b6d4)"
+                style="background:linear-gradient(140deg,#8b5cf6,#06b6d4)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#ff007f,#7c3aed)"
+                style="background:linear-gradient(140deg,#ff007f,#7c3aed)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#0ea5e9,#14b8a6)"
+                style="background:linear-gradient(140deg,#0ea5e9,#14b8a6)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#f97316,#ec4899)"
+                style="background:linear-gradient(140deg,#f97316,#ec4899)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#22c55e,#06b6d4)"
+                style="background:linear-gradient(140deg,#22c55e,#06b6d4)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#1d4ed8,#7c3aed)"
+                style="background:linear-gradient(140deg,#1d4ed8,#7c3aed)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#111827,#374151)"
+                style="background:linear-gradient(140deg,#111827,#374151)"
+              ></button>
+
+              <button
+                type="button"
+                class="gradient"
+                data-gradient="linear-gradient(140deg,#020617,#111827)"
+                style="background:linear-gradient(140deg,#020617,#111827)"
+              ></button>
+
+            </div>
+
+          </div>
+
+          <div
+            class="bg-panel hidden"
+            data-bg-panel="color"
+          >
+
+            <div class="color-picker-row">
+
+              <input
+                type="color"
+                class="color-input"
+                id="bgColorPicker"
+                value="#8b5cf6"
+              >
+
+              <input
+                type="text"
+                class="text-input"
+                id="bgColorText"
+                value="#8b5cf6"
+              >
+
+            </div>
+
+          </div>
+
+          <div
+            class="bg-panel hidden"
+            data-bg-panel="image"
+          >
+
+            <div class="image-row">
+
+              <button
+                type="button"
+                class="small-btn"
+                id="uploadImageBtn"
+              >
+                Upload Image
+              </button>
+
+              <button
+                type="button"
+                class="small-btn"
+                id="removeImageBtn"
+              >
+                Remove
+              </button>
+
+            </div>
+
+            <input
+              type="file"
+              id="imageInput"
+              class="file-input"
+              accept="image/*"
+            >
+
+          </div>
+
+          <div class="control" style="margin-top:12px">
+
+            <div class="control-label">
+              <span>Background Opacity</span>
+              <span id="opacityValue">100%</span>
+            </div>
+
+            <div class="range-row">
+
+              <input
+                type="range"
+                id="opacityRange"
+                min="0"
+                max="1"
+                step="0.05"
+                value="1"
+              >
+
+              <div
+                class="range-value"
+                id="opacityValueBox"
+              >100%</div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <section class="section">
+
+          <div class="section-title">BRANDING</div>
+
+          <div class="control">
+
+            <div class="switch-row">
+
+              <span class="switch-label">
+                Watermark
+              </span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="showWatermark"
+                >
+                <span class="slider"></span>
+              </label>
+
+            </div>
+
+          </div>
+
+          <div class="control">
+
+            <div class="control-label">
+              <span>Watermark Text</span>
+            </div>
+
+            <input
+              type="text"
+              class="text-input"
+              id="watermarkText"
+              value="Made with CodeSnap"
+            >
+
+          </div>
+
+        </section>
+
+        <div class="settings-credit">
+          <span>Created by</span>
+          <a
+            href="https://ahmatbadali.my.id"
+            target="_blank"
+            rel="noopener noreferrer"
+          >@Ahmat Badali</a>
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- =====================================================
+         WORKSPACE
+    ====================================================== -->
+
+    <main class="workspace">
+
+      <!-- MOBILE QUICK BAR -->
+
+      <div class="mobile-bar">
+
+        <div class="mobile-scroll">
+
+          <button
+            type="button"
+            class="btn mobile-action"
+            id="mobileSettingsBtn"
+          >
+            ☰ Settings
+          </button>
+
+          <select
+            class="select"
+            id="mobileLanguageSelect"
+          ></select>
+
+          <button
+            type="button"
+            class="btn mobile-action"
+            id="mobileCopyBtn"
+          >
+            ⧉ Copy
+          </button>
+
+          <button
+            type="button"
+            class="btn mobile-action"
+            id="mobileFormatBtn"
+          >
+            ✦ Format
+          </button>
+
+          <button
+            type="button"
+            class="btn mobile-action"
+            id="mobileClearBtn"
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            class="btn mobile-action"
+            id="mobileResetBtn"
+          >
+            ↺ Reset
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- TOOLBAR -->
+
+      <div class="toolbar">
+
+        <div class="toolbar-left">
+
+          <span
+            class="filename"
+            id="toolbarFilename"
+          >
+            snippet.js
+          </span>
+
+          <span
+            class="language-badge"
+            id="toolbarLanguage"
+          >
+            JAVASCRIPT
+          </span>
+
+        </div>
+
+        <div class="toolbar-right">
+
+          <button
+            type="button"
+            class="btn"
+            id="clearBtn"
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            class="btn"
+            id="formatBtn"
+          >
+            ✦ Format
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- EDITOR -->
+
+      <div class="editor-wrap">
+
+        <div class="editor">
+
+          <pre
+            class="editor-highlight"
+            aria-hidden="true"
+          ><code
+            id="highlightCode"
+            class="hljs"
+          ></code></pre>
+
+          <textarea
+            id="codeEditor"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+      <!-- PREVIEW -->
+
+      <div class="preview-area" id="previewArea">
+
+        <div
+          class="export-frame"
+          id="exportFrame"
+        >
+
+          <div
+            class="code-card"
+            id="codeCard"
+          >
+
+            <div
+              class="window-bar window-default"
+              id="windowBar"
+            >
+
+              <div
+                class="window-dots"
+                id="windowDots"
+              >
+
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+
+              </div>
+
+              <div
+                class="preview-title"
+                id="previewTitle"
+              >
+                <code id="previewTitleCode">
+                  snippet.js
+                </code>
+              </div>
+
+            </div>
+
+            <div class="preview-code">
+
+              <pre
+                class="preview-lines"
+                id="previewLines"
+              >1
+2
+3
+4
+5
+6
+7</pre>
+
+              <pre
+                class="preview-highlight"
+                id="previewHighlight"
+              ><code class="hljs"></code></pre>
+
+            </div>
+
+            <div
+              class="watermark hidden"
+              id="watermark"
+            >
+              Made with CodeSnap
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</div>
+
+<!-- =========================================================
+     MOBILE DRAWER
+========================================================== -->
+
+<div
+  class="drawer-overlay"
+  id="drawerOverlay"
+></div>
+
+<aside
+  class="mobile-drawer"
+  id="mobileDrawer"
+>
+
+  <div class="drawer-header">
+
+    <div class="drawer-title">
+      CodeSnap Settings
+    </div>
+
+    <button
+      type="button"
+      class="drawer-close"
+      id="drawerClose"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <div class="drawer-body">
+
+    <!-- WINDOW -->
+
+    <section class="drawer-section">
+
+      <div class="section-title">
+        WINDOW STYLE
+      </div>
+
+      <div class="window-style-grid mobile-window-grid">
+
+        <button
+          type="button"
+          class="window-style active"
+          data-window-style="default"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Default</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="macos"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">MacOS</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="minimal"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Minimal</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="dark"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Dark</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="linux"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Linux</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="terminal"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Terminal</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="solarized"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Solarized</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="neon"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Neon</span>
+        </button>
+
+        <button
+          type="button"
+          class="window-style"
+          data-window-style="full-black"
+        >
+          <div class="window-preview">
+            <div class="window-preview-dots">
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+              <span class="window-preview-dot"></span>
+            </div>
+          </div>
+          <span class="window-style-name">Full Black</span>
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- WINDOW OPTIONS -->
+
+    <section class="drawer-section">
+
+      <div class="section-title">
+        WINDOW CONTROLS
+      </div>
+
+      <div class="control">
+
+        <div class="switch-row">
+
+          <span class="switch-label">
+            Show Window
+          </span>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="mobileShowWindow"
+              checked
+            >
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+      <div class="control">
+
+        <div class="switch-row">
+
+          <span class="switch-label">
+            Show Title
+          </span>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="mobileShowTitle"
+              checked
+            >
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- EDITOR -->
+
+    <section class="drawer-section">
+
+      <div class="section-title">
+        CODE / EDITOR
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Language</span>
+        </div>
+
+        <select
+          class="select"
+          id="mobileEditorLanguage"
+        ></select>
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Filename</span>
+        </div>
+
+        <input
+          class="text-input"
+          id="mobileFilename"
+          value="snippet.js"
+        >
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Syntax Theme</span>
+        </div>
+
+        <select
+          class="select"
+          id="mobileTheme"
+        >
+
+          <option value="atom-one-dark">Atom One Dark</option>
+          <option value="github-dark">GitHub Dark</option>
+          <option value="github">GitHub</option>
+          <option value="monokai">Monokai</option>
+          <option value="dracula">Dracula</option>
+          <option value="night-owl">Night Owl</option>
+          <option value="nord">Nord</option>
+          <option value="vs2015">VS 2015</option>
+          <option value="a11y-dark">A11y Dark</option>
+          <option value="tokyo-night-dark">Tokyo Night Dark</option>
+          <option value="base16/onedark">Base16 One Dark</option>
+
+        </select>
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Font</span>
+        </div>
+
+        <select
+          class="select"
+          id="mobileFont"
+        >
+
+          <option value="jetbrains">JetBrains Mono</option>
+          <option value="fira">Fira Code</option>
+          <option value="sourcecode">Source Code Pro</option>
+          <option value="spacemono">Space Mono</option>
+          <option value="ubuntumono">Ubuntu Mono</option>
+          <option value="inconsolata">Inconsolata</option>
+          <option value="cascadia">Cascadia Code</option>
+          <option value="hack">Hack</option>
+          <option value="system">System Mono</option>
+          <option value="consolas">Consolas</option>
+
+        </select>
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Font Size</span>
+          <span id="mobileFontSizeLabel">14px</span>
+        </div>
+
+        <input
+          type="range"
+          id="mobileFontSize"
+          min="10"
+          max="28"
+          step="1"
+          value="14"
+        >
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Line Height</span>
+          <span id="mobileLineHeightLabel">1.55</span>
+        </div>
+
+        <input
+          type="range"
+          id="mobileLineHeight"
+          min="1.1"
+          max="2.2"
+          step="0.05"
+          value="1.55"
+        >
+
+      </div>
+
+      <div class="control">
+
+        <div class="switch-row">
+
+          <span class="switch-label">
+            Line Numbers
+          </span>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="mobileShowLines"
+              checked
+            >
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CANVAS -->
+
+    <section class="drawer-section">
+
+      <div class="section-title">
+        CANVAS
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Vertical Padding</span>
+          <span id="mobilePaddingVertLabel">64px</span>
+        </div>
+
+        <input
+          type="range"
+          id="mobilePaddingVert"
+          min="0"
+          max="160"
+          step="4"
+          value="64"
+        >
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Horizontal Padding</span>
+          <span id="mobilePaddingHorizLabel">64px</span>
+        </div>
+
+        <input
+          type="range"
+          id="mobilePaddingHoriz"
+          min="0"
+          max="160"
+          step="4"
+          value="64"
+        >
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Radius</span>
+          <span id="mobileRadiusLabel">14px</span>
+        </div>
+
+        <input
+          type="range"
+          id="mobileRadius"
+          min="0"
+          max="32"
+          step="1"
+          value="14"
+        >
+
+      </div>
+
+      <div class="control">
+
+        <div class="switch-row">
+
+          <span class="switch-label">
+            Drop Shadow
+          </span>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="mobileDropShadow"
+              checked
+            >
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- BRANDING -->
+
+    <section class="drawer-section">
+
+      <div class="section-title">
+        BRANDING
+      </div>
+
+      <div class="control">
+
+        <div class="switch-row">
+
+          <span class="switch-label">
+            Watermark
+          </span>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="mobileWatermark"
+            >
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+      <div class="control">
+
+        <div class="control-label">
+          <span>Watermark Text</span>
+        </div>
+
+        <input
+          type="text"
+          class="text-input"
+          id="mobileWatermarkText"
+          value="Made with CodeSnap"
+        >
+
+      </div>
+
+    </section>
+
+    <div class="settings-credit drawer-footer">
+      <span>Created by</span>
+      <a
+        href="https://ahmatbadali.my.id"
+        target="_blank"
+        rel="noopener noreferrer"
+      >@Ahmat Badali</a>
+    </div>
+
+  </div>
+
+</aside>
+
+<!-- =========================================================
+     LIBRARIES
+========================================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+<script src="https://unpkg.com/prettier@3.2.5/standalone.js"></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/babel.js"></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/typescript.js"></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/html.js"></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/postcss.js"></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/markdown.js"></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/estree.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+/* ============================================================
+   CODESNAP
+   Turn Code Into Visuals.
+============================================================ */
+
+"use strict";
+
+/* ============================================================
+   DEFAULT CODE
+============================================================ */
+
+const defaultCode = `const cyberind = {
+    name: "Cyberind",
+    website: "cyberind.my.id",
+    since: 2018
+};
+
+console.log("Hello, Cyberind!");`;
+
+/* ============================================================
+   LANGUAGES
+============================================================ */
+
+const languages = [
+  ["auto", "Auto Detect"],
+  ["plaintext", "Plain Text"],
+  ["javascript", "JavaScript"],
+  ["typescript", "TypeScript"],
+  ["xml", "HTML / XML"],
+  ["css", "CSS"],
+  ["scss", "SCSS"],
+  ["json", "JSON"],
+  ["python", "Python"],
+  ["php", "PHP"],
+  ["bash", "Bash"],
+  ["shell", "Shell"],
+  ["sql", "SQL"],
+  ["java", "Java"],
+  ["go", "Go"],
+  ["rust", "Rust"],
+  ["yaml", "YAML"],
+  ["markdown", "Markdown"]
+];
+
+/* ============================================================
+   FONT FAMILIES
+============================================================ */
+
+const fontFamilies = {
+  jetbrains: "'JetBrains Mono', monospace",
+  fira: "'Fira Code', monospace",
+  sourcecode: "'Source Code Pro', monospace",
+  spacemono: "'Space Mono', monospace",
+  ubuntumono: "'Ubuntu Mono', monospace",
+  inconsolata: "'Inconsolata', monospace",
+  cascadia: "'Cascadia Code', monospace",
+  hack: "'Hack', monospace",
+  system: "ui-monospace,SFMono-Regular,Menlo,monospace",
+  consolas: "Consolas,monospace"
+};
+
+/* ============================================================
+   STATE
+============================================================ */
+
+const state = {
+
+  language: "auto",
+
+  filename: "snippet.js",
+
+  font: "jetbrains",
+
+  fontSize: 14,
+
+  lineHeight: 1.55,
+
+  theme: "atom-one-dark",
+
+  bgColor:
+    "linear-gradient(140deg, #8b5cf6, #06b6d4)",
+
+  bgOpacity: 1,
+
+  bgImageUrl: "",
+
+  bgImageName: "",
+
+  showWindow: true,
+
+  showTitle: true,
+
+  showLines: true,
+
+  showHiddenChars: false,
+
+  firstLineNumber: 1,
+
+  windowStyle: "default",
+
+  paddingVert: 64,
+
+  paddingHoriz: 64,
+
+  radius: 14,
+
+  dropShadow: true,
+
+  shadowBlur: 70,
+
+  showWatermark: false,
+
+  watermarkText: "Made with CodeSnap"
+
+};
+
+/* ============================================================
+   PRESETS
+============================================================ */
+
+const presets = {
+
+  aurora: {
+    bg: "linear-gradient(140deg, #8b5cf6, #06b6d4)",
+    theme: "atom-one-dark",
+    window: "default"
+  },
+
+  sunset: {
+    bg: "linear-gradient(140deg, #ff007f, #7c3aed)",
+    theme: "dracula",
+    window: "macos"
+  },
+
+  synthwave: {
+    bg: "linear-gradient(140deg, #ff007f, #7c3aed, #06b6d4)",
+    theme: "night-owl",
+    window: "neon"
+  },
+
+  midnight: {
+    bg: "linear-gradient(140deg, #020617, #111827)",
+    theme: "github-dark",
+    window: "dark"
+  },
+
+  ocean: {
+    bg: "linear-gradient(140deg, #0ea5e9, #14b8a6)",
+    theme: "nord",
+    window: "linux"
+  },
+
+  forest: {
+    bg: "linear-gradient(140deg, #22c55e, #06b6d4)",
+    theme: "atom-one-dark",
+    window: "terminal"
+  },
+
+  mono: {
+    bg: "linear-gradient(140deg, #111827, #374151)",
+    theme: "github-dark",
+    window: "full-black"
+  }
+
+};
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+const $ = id => document.getElementById(id);
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+}
+
+function languageLabel(value) {
+
+  const found = languages.find(
+    item => item[0] === value
+  );
+
+  return found ? found[1] : value;
+
+}
+
+function detectedLanguage(code) {
+
+  if (state.language !== "auto") {
+    return state.language;
+  }
+
+  try {
+
+    const result =
+      hljs.highlightAuto(code || "");
+
+    return result.language || "plaintext";
+
+  } catch (error) {
+
+    return "plaintext";
+
+  }
+
+}
+
+function processHiddenCharacters(htmlText) {
+
+  if (!state.showHiddenChars) {
+    return htmlText;
+  }
+
+  return htmlText
+    .replace(
+      / /g,
+      '<span class="whitespace-space"> </span>'
+    )
+    .replace(
+      /\t/g,
+      '<span class="whitespace-tab">\t</span>'
+    );
+
+}
+
+function highlightCode(code) {
+
+  const language =
+    detectedLanguage(code);
+
+  let html = "";
+
+  if (
+    language === "plaintext" ||
+    language === "text"
+  ) {
+
+    html = escapeHtml(code);
+
+  } else {
+
+    try {
+
+      html =
+        hljs.highlight(
+          code,
+          {
+            language,
+            ignoreIllegals: true
+          }
+        ).value;
+
+    } catch (error) {
+
+      html = escapeHtml(code);
+
+    }
+
+  }
+
+  return processHiddenCharacters(html);
+
+}
+
+function highlightFilename(filename) {
+
+  return escapeHtml(filename);
+
+}
+
+function lineMarkup(code) {
+
+  const lines =
+    Math.max(
+      1,
+      String(code).split("\n").length
+    );
+
+  const start =
+    parseInt(state.firstLineNumber, 10) || 1;
+
+  return Array.from(
+    { length: lines },
+    (_, index) => start + index
+  ).join("\n");
+
+}
+
+function syncSelect(selectId, value) {
+
+  const element = $(selectId);
+
+  if (element) {
+    element.value = value;
+  }
+
+}
+
+function syncCheckbox(id, value) {
+
+  const element = $(id);
+
+  if (element) {
+    element.checked = !!value;
+  }
+
+}
+
+/* ============================================================
+   HIGHLIGHT THEME
+============================================================ */
+
+function setTheme(theme) {
+
+  state.theme = theme;
+
+  const link =
+    $("highlightThemeLink");
+
+  if (!link) return;
+
+  link.href =
+    "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/"
+    + theme
+    + ".min.css";
+
+}
+
+/* ============================================================
+   FONT
+============================================================ */
+
+function applyFont() {
+
+  const font =
+    fontFamilies[state.font]
+    || fontFamilies.jetbrains;
+
+  const targets = [
+
+    $("codeEditor"),
+
+    $("highlightCode"),
+
+    $("previewHighlight"),
+
+    $("previewHighlight")
+      ?.querySelector("code"),
+
+    $("previewLines"),
+
+    $("previewTitleCode")
+
+  ];
+
+  targets.forEach(element => {
+
+    if (!element) return;
+
+    element.style.fontFamily = font;
+    element.style.fontSize =
+      state.fontSize + "px";
+
+    element.style.lineHeight =
+      String(state.lineHeight);
+
+  });
+
+}
+
+/* ============================================================
+   PREVIEW AUTO SIZE
+============================================================ */
+
+function sizePreviewToContent() {
+
+  const card =
+    $("codeCard");
+
+  const preview =
+    $("previewHighlight");
+
+  const lines =
+    $("previewLines");
+
+  if (!card || !preview) {
+    return;
+  }
+
+  /*
+    Jangan beri width fixed.
+    Biarkan code mengikuti panjang baris terpanjang.
+  */
+
+  preview.style.width = "max-content";
+  preview.style.minWidth = "0";
+
+  requestAnimationFrame(() => {
+
+    const codeWidth =
+      Math.ceil(
+        preview.scrollWidth
+      );
+
+    const lineWidth =
+      state.showLines && lines
+        ? Math.ceil(
+            lines.getBoundingClientRect().width
+          )
+        : 0;
+
+    const totalWidth =
+      codeWidth + lineWidth;
+
+    if (totalWidth > 0) {
+
+      card.style.width =
+        totalWidth + "px";
+
+    } else {
+
+      card.style.width =
+        "max-content";
+
+    }
+
+  });
+
+}
+
+/* ============================================================
+   BACKGROUND
+============================================================ */
+
+function applyBackground() {
+
+  const frame =
+    $("exportFrame");
+
+  if (!frame) return;
+
+  frame.style.background =
+    state.bgColor;
+
+  frame.style.opacity =
+    String(state.bgOpacity);
+
+  if (state.bgImageUrl) {
+
+    frame.style.backgroundImage =
+      "linear-gradient(rgba(0,0,0,0.10),rgba(0,0,0,0.10)),url(\""
+      + state.bgImageUrl
+      + "\")";
+
+    frame.style.backgroundSize =
+      "cover";
+
+    frame.style.backgroundPosition =
+      "center";
+
+  } else {
+
+    frame.style.backgroundImage =
+      "none";
+
+  }
+
+}
+
+function setGradient(value) {
+
+  state.bgColor = value;
+  state.bgImageUrl = "";
+
+  render();
+
+}
+
+function setColor(value) {
+
+  if (!value) return;
+
+  state.bgColor = value;
+  state.bgImageUrl = "";
+
+  render();
+
+}
+
+/* ============================================================
+   WINDOW STYLE
+============================================================ */
+
+function applyWindowStyle() {
+
+  const windowBar =
+    $("windowBar");
+
+  if (!windowBar) return;
+
+  windowBar.className =
+    "window-bar window-"
+    + state.windowStyle;
+
+  if (!state.showWindow) {
+
+    windowBar.classList.add("hidden");
+
+  }
+
+}
+
+function applyWindowVisibility() {
+
+  const windowBar =
+    $("windowBar");
+
+  const title =
+    $("previewTitle");
+
+  if (windowBar) {
+
+    windowBar.classList.toggle(
+      "hidden",
+      !state.showWindow
+    );
+
+  }
+
+  if (title) {
+
+    title.classList.toggle(
+      "hidden",
+      !state.showTitle
+    );
+
+  }
+
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+
+function render() {
+
+  const editor =
+    $("codeEditor");
+
+  if (!editor) return;
+
+  const code =
+    editor.value || "";
+
+  const highlighted =
+    highlightCode(code);
+
+  /* Editor syntax */
+
+  const editorCode =
+    $("highlightCode");
+
+  if (editorCode) {
+
+    editorCode.innerHTML =
+      highlighted;
+
+    editorCode.classList.add("hljs");
+
+  }
+
+  /* Preview syntax */
+
+  const preview =
+    $("previewHighlight");
+
+  if (preview) {
+
+    const previewCode =
+      preview.querySelector("code");
+
+    if (previewCode) {
+
+      /*
+        FIX PENTING:
+        syntax HTML benar-benar dimasukkan
+        ke element code.
+      */
+
+      previewCode.innerHTML =
+        highlighted;
+
+      previewCode.classList.add("hljs");
+
+    } else {
+
+      preview.innerHTML =
+        highlighted;
+
+      preview.classList.add("hljs");
+
+    }
+
+  }
+
+  /* Lines */
+
+  const lines =
+    $("previewLines");
+
+  if (lines) {
+
+    lines.textContent =
+      lineMarkup(code);
+
+    lines.classList.toggle(
+      "hidden",
+      !state.showLines
+    );
+
+  }
+
+  /* Filename */
+
+  const filename =
+    $("toolbarFilename");
+
+  if (filename) {
+
+    filename.textContent =
+      state.filename;
+
+  }
+
+  const titleCode =
+    $("previewTitleCode");
+
+  if (titleCode) {
+
+    titleCode.innerHTML =
+      highlightFilename(
+        state.filename
+      );
+
+  }
+
+  /* Language */
+
+  const actualLanguage =
+    detectedLanguage(code);
+
+  const languageText =
+    languageLabel(
+      state.language === "auto"
+        ? actualLanguage
+        : state.language
+    );
+
+  const badge =
+    $("toolbarLanguage");
+
+  if (badge) {
+
+    badge.textContent =
+      languageText;
+
+  }
+
+  /* Window */
+
+  applyWindowStyle();
+  applyWindowVisibility();
+
+  /* Background */
+
+  applyBackground();
+
+  /* Frame */
+
+  const frame =
+    $("exportFrame");
+
+  if (frame) {
+
+    frame.style.padding =
+      state.paddingVert
+      + "px "
+      + state.paddingHoriz
+      + "px";
+
+  }
+
+  /* Card */
+
+  const card =
+    $("codeCard");
+
+  if (card) {
+
+    card.style.borderRadius =
+      state.radius + "px";
+
+    card.style.boxShadow =
+      state.dropShadow
+        ? "0 24px "
+          + state.shadowBlur
+          + "px rgba(0,0,0,.53)"
+        : "none";
+
+  }
+
+  /* Watermark */
+
+  const watermark =
+    $("watermark");
+
+  if (watermark) {
+
+    watermark.textContent =
+      state.watermarkText;
+
+    watermark.classList.toggle(
+      "hidden",
+      !state.showWatermark
+    );
+
+  }
+
+  /* Font */
+
+  applyFont();
+
+  /* Controls */
+
+  syncControls();
+
+  /*
+    Delay measurement sampai browser
+    selesai melakukan layout dan syntax highlight.
+  */
+
+  sizePreviewToContent();
+
+}
+
+/* ============================================================
+   SYNC CONTROLS
+============================================================ */
+
+function syncControls() {
+
+  /* Language */
+
+  syncSelect(
+    "languageSelect",
+    state.language
+  );
+
+  syncSelect(
+    "mobileLanguageSelect",
+    state.language
+  );
+
+  syncSelect(
+    "mobileEditorLanguage",
+    state.language
+  );
+
+  /* Filename */
+
+  const filename =
+    $("filenameInput");
+
+  if (filename) {
+    filename.value =
+      state.filename;
+  }
+
+  const mobileFilename =
+    $("mobileFilename");
+
+  if (mobileFilename) {
+    mobileFilename.value =
+      state.filename;
+  }
+
+  /* Theme */
+
+  syncSelect(
+    "themeSelect",
+    state.theme
+  );
+
+  syncSelect(
+    "mobileTheme",
+    state.theme
+  );
+
+  /* Font */
+
+  syncSelect(
+    "fontSelect",
+    state.font
+  );
+
+  syncSelect(
+    "mobileFont",
+    state.font
+  );
+
+  /* Checkboxes */
+
+  syncCheckbox(
+    "showWindow",
+    state.showWindow
+  );
+
+  syncCheckbox(
+    "mobileShowWindow",
+    state.showWindow
+  );
+
+  syncCheckbox(
+    "showTitle",
+    state.showTitle
+  );
+
+  syncCheckbox(
+    "mobileShowTitle",
+    state.showTitle
+  );
+
+  syncCheckbox(
+    "showLines",
+    state.showLines
+  );
+
+  syncCheckbox(
+    "mobileShowLines",
+    state.showLines
+  );
+
+  syncCheckbox(
+    "showHiddenChars",
+    state.showHiddenChars
+  );
+
+  syncCheckbox(
+    "dropShadow",
+    state.dropShadow
+  );
+
+  syncCheckbox(
+    "mobileDropShadow",
+    state.dropShadow
+  );
+
+  syncCheckbox(
+    "showWatermark",
+    state.showWatermark
+  );
+
+  syncCheckbox(
+    "mobileWatermark",
+    state.showWatermark
+  );
+
+  /* Ranges */
+
+  const ranges = [
+
+    ["fontSizeRange", state.fontSize],
+    ["mobileFontSize", state.fontSize],
+
+    ["lineHeightRange", state.lineHeight],
+    ["mobileLineHeight", state.lineHeight],
+
+    ["paddingVertRange", state.paddingVert],
+    ["mobilePaddingVert", state.paddingVert],
+
+    ["paddingHorizRange", state.paddingHoriz],
+    ["mobilePaddingHoriz", state.paddingHoriz],
+
+    ["radiusRange", state.radius],
+    ["mobileRadius", state.radius],
+
+    ["shadowBlurRange", state.shadowBlur],
+    ["opacityRange", state.bgOpacity]
+
+  ];
+
+  ranges.forEach(
+    ([id, value]) => {
+
+      const element = $(id);
+
+      if (element) {
+        element.value = value;
+      }
+
+    }
+  );
+
+  /* Labels */
+
+  if ($("fontSizeValue"))
+    $("fontSizeValue").textContent =
+      state.fontSize + "px";
+
+  if ($("fontSizeValueBox"))
+    $("fontSizeValueBox").textContent =
+      state.fontSize + "px";
+
+  if ($("mobileFontSizeLabel"))
+    $("mobileFontSizeLabel").textContent =
+      state.fontSize + "px";
+
+  if ($("lineHeightValue"))
+    $("lineHeightValue").textContent =
+      state.lineHeight.toFixed(2);
+
+  if ($("lineHeightValueBox"))
+    $("lineHeightValueBox").textContent =
+      state.lineHeight.toFixed(2);
+
+  if ($("mobileLineHeightLabel"))
+    $("mobileLineHeightLabel").textContent =
+      state.lineHeight.toFixed(2);
+
+  if ($("paddingVertValue"))
+    $("paddingVertValue").textContent =
+      state.paddingVert + "px";
+
+  if ($("paddingVertValueBox"))
+    $("paddingVertValueBox").textContent =
+      state.paddingVert + "px";
+
+  if ($("mobilePaddingVertLabel"))
+    $("mobilePaddingVertLabel").textContent =
+      state.paddingVert + "px";
+
+  if ($("paddingHorizValue"))
+    $("paddingHorizValue").textContent =
+      state.paddingHoriz + "px";
+
+  if ($("paddingHorizValueBox"))
+    $("paddingHorizValueBox").textContent =
+      state.paddingHoriz + "px";
+
+  if ($("mobilePaddingHorizLabel"))
+    $("mobilePaddingHorizLabel").textContent =
+      state.paddingHoriz + "px";
+
+  if ($("radiusValue"))
+    $("radiusValue").textContent =
+      state.radius + "px";
+
+  if ($("radiusValueBox"))
+    $("radiusValueBox").textContent =
+      state.radius + "px";
+
+  if ($("mobileRadiusLabel"))
+    $("mobileRadiusLabel").textContent =
+      state.radius + "px";
+
+  if ($("shadowBlurValue"))
+    $("shadowBlurValue").textContent =
+      state.shadowBlur + "px";
+
+  if ($("shadowBlurValueBox"))
+    $("shadowBlurValueBox").textContent =
+      state.shadowBlur + "px";
+
+  if ($("opacityValue"))
+    $("opacityValue").textContent =
+      Math.round(state.bgOpacity * 100)
+      + "%";
+
+  if ($("opacityValueBox"))
+    $("opacityValueBox").textContent =
+      Math.round(state.bgOpacity * 100)
+      + "%";
+
+  /* First line */
+
+  if ($("firstLineNumber"))
+    $("firstLineNumber").value =
+      state.firstLineNumber;
+
+  /* Watermark */
+
+  if ($("watermarkText"))
+    $("watermarkText").value =
+      state.watermarkText;
+
+  if ($("mobileWatermarkText"))
+    $("mobileWatermarkText").value =
+      state.watermarkText;
+
+  /* Color */
+
+  if ($("bgColorText")) {
+
+    if (!state.bgColor.startsWith("linear-gradient")) {
+
+      $("bgColorText").value =
+        state.bgColor;
+
+    }
+
+  }
+
+  /* Window buttons */
+
+  document
+    .querySelectorAll(".window-style")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.windowStyle
+        === state.windowStyle
+      );
+
+    });
+
+}
+
+/* ============================================================
+   SET FIELD
+============================================================ */
+
+function setField(field, value) {
+
+  state[field] = value;
+
+  render();
+
+}
+
+/* ============================================================
+   POPULATE LANGUAGES
+============================================================ */
+
+function populateLanguages() {
+
+  const selects = [
+
+    $("languageSelect"),
+    $("mobileLanguageSelect"),
+    $("mobileEditorLanguage")
+
+  ];
+
+  selects.forEach(select => {
+
+    if (!select) return;
+
+    select.innerHTML = "";
+
+    languages.forEach(
+      ([value, label]) => {
+
+        const option =
+          document.createElement("option");
+
+        option.value = value;
+        option.textContent = label;
+
+        select.appendChild(option);
+
+      }
+    );
+
+    select.value =
+      state.language;
+
+  });
+
+}
+
+/* ============================================================
+   TAB SYSTEM
+============================================================ */
+
+function activateTab(tab) {
+
+  document
+    .querySelectorAll(".carbon-tab")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.tab === tab
+      );
+
+    });
+
+  document
+    .querySelectorAll(".tab-panel")
+    .forEach(panel => {
+
+      panel.classList.toggle(
+        "hidden",
+        panel.dataset.panel !== tab
+      );
+
+    });
+
+}
+
+/* ============================================================
+   BACKGROUND TAB
+============================================================ */
+
+function activateBackgroundTab(tab) {
+
+  document
+    .querySelectorAll(".bg-tab")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.bgTab === tab
+      );
+
+    });
+
+  document
+    .querySelectorAll(".bg-panel")
+    .forEach(panel => {
+
+      panel.classList.toggle(
+        "hidden",
+        panel.dataset.bgPanel !== tab
+      );
+
+    });
+
+}
+
+/* ============================================================
+   FORMAT CODE
+============================================================ */
+
+async function formatCodeWithPrettier() {
+
+  const editor =
+    $("codeEditor");
+
+  if (!editor) return;
+
+  const code =
+    editor.value;
+
+  if (!code.trim()) {
+    return;
+  }
+
+  let parser = null;
+
+  switch (state.language) {
+
+    case "javascript":
+      parser = "babel";
+      break;
+
+    case "typescript":
+      parser = "typescript";
+      break;
+
+    case "xml":
+      parser = "html";
+      break;
+
+    case "css":
+    case "scss":
+      parser = "css";
+      break;
+
+    case "json":
+      parser = "json";
+      break;
+
+    case "markdown":
+      parser = "markdown";
+      break;
+
+    default:
+      parser = "babel";
+
+  }
+
+  try {
+
+    if (
+      typeof prettier === "undefined"
+      || !prettier.format
+    ) {
+
+      throw new Error(
+        "Prettier belum tersedia."
+      );
+
+    }
+
+    const formatted =
+      await prettier.format(
+        code,
+        {
+          parser,
+          plugins: prettierPlugins,
+          semi: true,
+          singleQuote: false
+        }
+      );
+
+    editor.value =
+      formatted;
+
+    syncEditorScroll();
+
+    render();
+
+  } catch (error) {
+
+    /*
+      Jika parser tidak cocok,
+      jangan merusak kode yang sedang diedit.
+    */
+
+    console.warn(
+      "Format gagal:",
+      error
+    );
+
+    alert(
+      "Kode tidak dapat diformat otomatis untuk bahasa ini."
+    );
+
+  }
+
+}
+
+/* ============================================================
+   EDITOR SCROLL
+============================================================ */
+
+function syncEditorScroll() {
+
+  const editor =
+    $("codeEditor");
+
+  const highlight =
+    $("highlightCode")
+      ?.closest(".editor-highlight");
+
+  if (!editor || !highlight) {
+    return;
+  }
+
+  highlight.scrollTop =
+    editor.scrollTop;
+
+  highlight.scrollLeft =
+    editor.scrollLeft;
+
+}
+
+/* ============================================================
+   COPY
+============================================================ */
+
+async function copyCodeAction() {
+
+  const editor =
+    $("codeEditor");
+
+  if (!editor) return;
+
+  const code =
+    editor.value;
+
+  try {
+
+    await navigator.clipboard.writeText(
+      code
+    );
+
+    showToast("Code copied!");
+
+  } catch (error) {
+
+    editor.select();
+
+    document.execCommand("copy");
+
+    editor.setSelectionRange(
+      editor.value.length,
+      editor.value.length
+    );
+
+    showToast("Code copied!");
+
+  }
+
+}
+
+/* ============================================================
+   CLEAR
+============================================================ */
+
+function clearEditorAction() {
+
+  const editor =
+    $("codeEditor");
+
+  if (!editor) return;
+
+  if (!editor.value.trim()) {
+    return;
+  }
+
+  const confirmed =
+    confirm(
+      "Hapus semua kode dari editor?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  editor.value = "";
+
+  render();
+
+}
+
+/* ============================================================
+   RESET
+============================================================ */
+
+function resetApp() {
+
+  const confirmed =
+    confirm(
+      "Reset semua pengaturan CodeSnap?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  state.language = "auto";
+  state.filename = "snippet.js";
+  state.font = "jetbrains";
+  state.fontSize = 14;
+  state.lineHeight = 1.55;
+  state.theme = "atom-one-dark";
+
+  state.bgColor =
+    "linear-gradient(140deg, #8b5cf6, #06b6d4)";
+
+  state.bgOpacity = 1;
+
+  state.bgImageUrl = "";
+  state.bgImageName = "";
+
+  state.showWindow = true;
+  state.showTitle = true;
+  state.showLines = true;
+  state.showHiddenChars = false;
+
+  state.firstLineNumber = 1;
+
+  state.windowStyle = "default";
+
+  state.paddingVert = 64;
+  state.paddingHoriz = 64;
+
+  state.radius = 14;
+
+  state.dropShadow = true;
+  state.shadowBlur = 70;
+
+  state.showWatermark = false;
+  state.watermarkText =
+    "Made with CodeSnap";
+
+  const editor =
+    $("codeEditor");
+
+  if (editor) {
+    editor.value =
+      defaultCode;
+  }
+
+  setTheme(
+    state.theme
+  );
+
+  render();
+
+  showToast(
+    "CodeSnap berhasil di-reset."
+  );
+
+}
+
+/* ============================================================
+   EXPORT PNG
+============================================================ */
+
+async function exportPNG() {
+
+  const frame =
+    $("exportFrame");
+
+  if (!frame) {
+    return;
+  }
+
+  if (
+    typeof html2canvas === "undefined"
+  ) {
+
+    alert(
+      "Library export belum tersedia."
+    );
+
+    return;
+
+  }
+
+  const button =
+    $("pngBtn");
+
+  const originalText =
+    button?.innerHTML;
+
+  if (button) {
+
+    button.disabled = true;
+    button.innerHTML =
+      "⏳ Exporting...";
+
+  }
+
+  /*
+    Pastikan ukuran preview sudah final
+    sebelum html2canvas membaca elemen.
+  */
+
+  sizePreviewToContent();
+
+  await new Promise(
+    resolve =>
+      requestAnimationFrame(
+        () => requestAnimationFrame(resolve)
+      )
+  );
+
+  try {
+
+    const canvas =
+      await html2canvas(
+        frame,
+        {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          logging: false
+        }
+      );
+
+    const link =
+      document.createElement("a");
+
+    link.download =
+      "codesnap.png";
+
+    link.href =
+      canvas.toDataURL(
+        "image/png"
+      );
+
+    link.click();
+
+    showToast(
+      "PNG berhasil dibuat."
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Gagal membuat PNG. Silakan coba lagi."
+    );
+
+  } finally {
+
+    if (button) {
+
+      button.disabled = false;
+      button.innerHTML =
+        originalText;
+
+    }
+
+  }
+
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+let toastTimer = null;
+
+function showToast(message) {
+
+  let toast =
+    document.getElementById(
+      "codesnapToast"
+    );
+
+  if (!toast) {
+
+    toast =
+      document.createElement("div");
+
+    toast.id =
+      "codesnapToast";
+
+    Object.assign(
+      toast.style,
+      {
+        position: "fixed",
+        left: "50%",
+        bottom: "24px",
+        transform: "translateX(-50%) translateY(10px)",
+        zIndex: "9999",
+        padding: "10px 14px",
+        border: "1px solid #34435b",
+        borderRadius: "9px",
+        background: "#111b29",
+        color: "#edf3ff",
+        fontSize: "11px",
+        fontWeight: "700",
+        boxShadow: "0 12px 35px rgba(0,0,0,.4)",
+        opacity: "0",
+        pointerEvents: "none",
+        transition: "all .18s ease"
+      }
+    );
+
+    document.body.appendChild(toast);
+
+  }
+
+  toast.textContent =
+    message;
+
+  clearTimeout(toastTimer);
+
+  requestAnimationFrame(() => {
+
+    toast.style.opacity = "1";
+    toast.style.transform =
+      "translateX(-50%) translateY(0)";
+
+  });
+
+  toastTimer =
+    setTimeout(() => {
+
+      toast.style.opacity = "0";
+
+      toast.style.transform =
+        "translateX(-50%) translateY(10px)";
+
+    }, 1800);
+
+}
+
+/* ============================================================
+   MOBILE DRAWER
+============================================================ */
+
+function openDrawer() {
+
+  $("mobileDrawer")
+    ?.classList.add("open");
+
+  $("drawerOverlay")
+    ?.classList.add("open");
+
+}
+
+function closeDrawer() {
+
+  $("mobileDrawer")
+    ?.classList.remove("open");
+
+  $("drawerOverlay")
+    ?.classList.remove("open");
+
+}
+
+/* ============================================================
+   EVENTS
+============================================================ */
+
+/* Editor */
+
+$("codeEditor")
+  ?.addEventListener(
+    "input",
+    render
+  );
+
+$("codeEditor")
+  ?.addEventListener(
+    "scroll",
+    syncEditorScroll
+  );
+
+/* Copy */
+
+$("copyBtn")
+  ?.addEventListener(
+    "click",
+    copyCodeAction
+  );
+
+$("mobileCopyBtn")
+  ?.addEventListener(
+    "click",
+    copyCodeAction
+  );
+
+/* Reset */
+
+$("resetBtn")
+  ?.addEventListener(
+    "click",
+    resetApp
+  );
+
+$("mobileResetBtn")
+  ?.addEventListener(
+    "click",
+    resetApp
+  );
+
+/* Clear */
+
+$("clearBtn")
+  ?.addEventListener(
+    "click",
+    clearEditorAction
+  );
+
+$("mobileClearBtn")
+  ?.addEventListener(
+    "click",
+    clearEditorAction
+  );
+
+/* Format */
+
+$("formatBtn")
+  ?.addEventListener(
+    "click",
+    formatCodeWithPrettier
+  );
+
+$("mobileFormatBtn")
+  ?.addEventListener(
+    "click",
+    formatCodeWithPrettier
+  );
+
+/* Export */
+
+$("pngBtn")
+  ?.addEventListener(
+    "click",
+    exportPNG
+  );
+
+/* Tabs */
+
+document
+  .querySelectorAll(".carbon-tab")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        activateTab(
+          button.dataset.tab
+        );
+
+      }
+    );
+
+  });
+
+/* Window styles */
+
+document
+  .querySelectorAll(".window-style")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        /*
+          Ini sengaja menggunakan data-window-style,
+          sehingga tombol desktop dan mobile
+          sama-sama mengubah state yang sama.
+        */
+
+        setField(
+          "windowStyle",
+          button.dataset.windowStyle
+        );
+
+      }
+    );
+
+  });
+
+/* Presets */
+
+document
+  .querySelectorAll(".preset")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const name =
+          button.dataset.preset;
+
+        const preset =
+          presets[name];
+
+        if (!preset) {
+          return;
+        }
+
+        state.bgColor =
+          preset.bg;
+
+        state.bgImageUrl =
+          "";
+
+        state.theme =
+          preset.theme;
+
+        state.windowStyle =
+          preset.window;
+
+        document
+          .querySelectorAll(".preset")
+          .forEach(item => {
+
+            item.classList.toggle(
+              "active",
+              item === button
+            );
+
+          });
+
+        setTheme(
+          state.theme
+        );
+
+        render();
+
+      }
+    );
+
+  });
+
+/* Language */
+
+[
+  "languageSelect",
+  "mobileLanguageSelect",
+  "mobileEditorLanguage"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.language =
+        event.target.value;
+
+      syncControls();
+      render();
+
+    }
+  );
+
+});
+
+/* Filename */
+
+$("filenameInput")
+  ?.addEventListener(
+    "input",
+    event => {
+
+      state.filename =
+        event.target.value
+        || "snippet.js";
+
+      render();
+
+    }
+  );
+
+$("mobileFilename")
+  ?.addEventListener(
+    "input",
+    event => {
+
+      state.filename =
+        event.target.value
+        || "snippet.js";
+
+      render();
+
+    }
+  );
+
+/* Theme */
+
+[
+  "themeSelect",
+  "mobileTheme"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      setTheme(
+        event.target.value
+      );
+
+      render();
+
+    }
+  );
+
+});
+
+/* Font */
+
+[
+  "fontSelect",
+  "mobileFont"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.font =
+        event.target.value;
+
+      render();
+
+    }
+  );
+
+});
+
+/* Font size */
+
+[
+  ["fontSizeRange", "fontSize"],
+  ["mobileFontSize", "fontSize"]
+]
+.forEach(
+  ([id, field]) => {
+
+    $(id)?.addEventListener(
+      "input",
+      event => {
+
+        state[field] =
+          Number(event.target.value);
+
+        render();
+
+      }
+    );
+
+  }
+);
+
+/* Line height */
+
+[
+  ["lineHeightRange", "lineHeight"],
+  ["mobileLineHeight", "lineHeight"]
+]
+.forEach(
+  ([id, field]) => {
+
+    $(id)?.addEventListener(
+      "input",
+      event => {
+
+        state[field] =
+          Number(event.target.value);
+
+        render();
+
+      }
+    );
+
+  }
+);
+
+/* First line */
+
+$("firstLineNumber")
+  ?.addEventListener(
+    "input",
+    event => {
+
+      state.firstLineNumber =
+        Math.max(
+          1,
+          Number(event.target.value) || 1
+        );
+
+      render();
+
+    }
+  );
+
+/* Show lines */
+
+[
+  "showLines",
+  "mobileShowLines"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.showLines =
+        event.target.checked;
+
+      render();
+
+    }
+  );
+
+});
+
+/* Hidden characters */
+
+$("showHiddenChars")
+  ?.addEventListener(
+    "change",
+    event => {
+
+      state.showHiddenChars =
+        event.target.checked;
+
+      render();
+
+    }
+  );
+
+/* Show window */
+
+[
+  "showWindow",
+  "mobileShowWindow"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.showWindow =
+        event.target.checked;
+
+      render();
+
+    }
+  );
+
+});
+
+/* Show title */
+
+[
+  "showTitle",
+  "mobileShowTitle"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.showTitle =
+        event.target.checked;
+
+      render();
+
+    }
+  );
+
+});
+
+/* Padding */
+
+[
+  ["paddingVertRange", "paddingVert"],
+  ["mobilePaddingVert", "paddingVert"],
+  ["paddingHorizRange", "paddingHoriz"],
+  ["mobilePaddingHoriz", "paddingHoriz"],
+  ["radiusRange", "radius"],
+  ["mobileRadius", "radius"],
+  ["shadowBlurRange", "shadowBlur"]
+]
+.forEach(
+  ([id, field]) => {
+
+    $(id)?.addEventListener(
+      "input",
+      event => {
+
+        state[field] =
+          Number(event.target.value);
+
+        render();
+
+      }
+    );
+
+  }
+);
+
+/* Drop shadow */
+
+[
+  "dropShadow",
+  "mobileDropShadow"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.dropShadow =
+        event.target.checked;
+
+      render();
+
+    }
+  );
+
+});
+
+/* Watermark */
+
+[
+  "showWatermark",
+  "mobileWatermark"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "change",
+    event => {
+
+      state.showWatermark =
+        event.target.checked;
+
+      render();
+
+    }
+  );
+
+});
+
+[
+  "watermarkText",
+  "mobileWatermarkText"
+]
+.forEach(id => {
+
+  $(id)?.addEventListener(
+    "input",
+    event => {
+
+      state.watermarkText =
+        event.target.value
+        || "Made with CodeSnap";
+
+      render();
+
+    }
+  );
+
+});
+
+/* Opacity */
+
+$("opacityRange")
+  ?.addEventListener(
+    "input",
+    event => {
+
+      state.bgOpacity =
+        Number(event.target.value);
+
+      render();
+
+    }
+  );
+
+/* Background tabs */
+
+document
+  .querySelectorAll(".bg-tab")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        activateBackgroundTab(
+          button.dataset.bgTab
+        );
+
+      }
+    );
+
+  });
+
+/* Gradient */
+
+document
+  .querySelectorAll(".gradient")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        setGradient(
+          button.dataset.gradient
+        );
+
+      }
+    );
+
+  });
+
+/* Color picker */
+
+$("bgColorPicker")
+  ?.addEventListener(
+    "input",
+    event => {
+
+      setColor(
+        event.target.value
+      );
+
+    }
+  );
+
+$("bgColorText")
+  ?.addEventListener(
+    "change",
+    event => {
+
+      const value =
+        event.target.value.trim();
+
+      if (
+        /^#[0-9a-f]{3,8}$/i.test(value)
+      ) {
+
+        setColor(value);
+
+      }
+
+    }
+  );
+
+/* Image upload */
+
+$("uploadImageBtn")
+  ?.addEventListener(
+    "click",
+    () => {
+
+      $("imageInput")?.click();
+
+    }
+  );
+
+$("imageInput")
+  ?.addEventListener(
+    "change",
+    event => {
+
+      const file =
+        event.target.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+
+        alert(
+          "File yang dipilih bukan gambar."
+        );
+
+        return;
+
+      }
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        event => {
+
+          state.bgImageUrl =
+            event.target.result;
+
+          state.bgImageName =
+            file.name;
+
+          render();
+
+        };
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+/* Remove image */
+
+$("removeImageBtn")
+  ?.addEventListener(
+    "click",
+    () => {
+
+      state.bgImageUrl =
+        "";
+
+      state.bgImageName =
+        "";
+
+      if ($("imageInput")) {
+        $("imageInput").value =
+          "";
+      }
+
+      render();
+
+    }
+  );
+
+/* Mobile drawer */
+
+$("mobileSettingsBtn")
+  ?.addEventListener(
+    "click",
+    openDrawer
+  );
+
+$("drawerClose")
+  ?.addEventListener(
+    "click",
+    closeDrawer
+  );
+
+$("drawerOverlay")
+  ?.addEventListener(
+    "click",
+    closeDrawer
+  );
+
+/* Escape closes drawer */
+
+document
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        closeDrawer();
+
+      }
+
+    }
+  );
+
+/* Window resize */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    sizePreviewToContent();
+
+  }
+);
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+function init() {
+
+  populateLanguages();
+
+  const editor =
+    $("codeEditor");
+
+  if (editor) {
+
+    editor.value =
+      defaultCode;
+
+  }
+
+  setTheme(
+    state.theme
+  );
+
+  activateTab(
+    "window"
+  );
+
+  activateBackgroundTab(
+    "gradient"
+  );
+
+  render();
+
+}
+
+/* Start */
+
+init();
+
+</script>
+
+</body>
+</html>
